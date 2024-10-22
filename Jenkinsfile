@@ -11,22 +11,40 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Thực hiện lệnh build (tùy thuộc vào công cụ bạn đang sử dụng, ví dụ Maven)
-                sh 'mvn clean package'  // Hoặc lệnh build khác nếu bạn không dùng Maven
+                // Thực hiện lệnh build
+                script {
+                    // Kiểm tra nếu có file pom.xml, nếu có thì sử dụng Maven
+                    if (fileExists('pom.xml')) {
+                        sh 'mvn clean package'
+                    } else {
+                        // Thay thế bằng lệnh build khác nếu không dùng Maven
+                        echo 'No Maven project found, skipping build step.'
+                    }
+                }
             }
         }
 
         stage('Test') {
             steps {
-                // Chạy test (có thể dùng JUnit, TestNG, hoặc các framework khác)
-                sh 'mvn test'  // Hoặc lệnh test khác nếu bạn không dùng Maven
+                // Chạy test
+                script {
+                    // Kiểm tra nếu có file pom.xml, nếu có thì sử dụng Maven
+                    if (fileExists('pom.xml')) {
+                        sh 'mvn test'
+                    } else {
+                        // Thay thế bằng lệnh test khác nếu không dùng Maven
+                        echo 'No Maven project found, skipping test step.'
+                    }
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                // Triển khai ứng dụng (tùy thuộc vào môi trường và cách triển khai của bạn)
+                // Triển khai ứng dụng
                 echo 'Deploying application...' // Thay thế bằng lệnh thực tế để triển khai
+                // Ví dụ lệnh deploy thực tế:
+                // sh './deploy.sh'
             }
         }
     }
@@ -38,5 +56,8 @@ pipeline {
         failure {
             echo 'Pipeline failed.'
         }
-    }
-}
+        always {
+            // Bước này sẽ chạy bất kể thành công hay thất bại
+            echo 'Cleaning up resources...'
+            // Thực hiện các bước cleanup nếu cần
+     
